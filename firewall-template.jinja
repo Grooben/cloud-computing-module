@@ -10,3 +10,11 @@ resources:
     allowed:
     - IPProtocol: {{properties["protocol"]}}
       ports: ["80", "443"]
+- name: {{env["name"]}}-allow-ssh
+  type: compute.v1.firewall
+  properties:
+    network: {{properties["network"]}}-allow-ssh
+    sourceRanges: ["0.0.0.0/0"]
+    allowed:
+    - IPProtocol: TCP
+      ports: ["22"]
