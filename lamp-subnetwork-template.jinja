@@ -6,6 +6,6 @@ resources:
 - name: {{env["name"]}}
   type: compute.v1.subnetwork
   properties: 
-    ipCidrRange: {{env["ipRange"]}}
-    network: {{env["network"]}}
-    region: {{env["region"]}}
+    ipCidrRange: {{properties["ipRange"]}}
+    network: {{properties["network"]}}
+    region: {{properties["region"]}}

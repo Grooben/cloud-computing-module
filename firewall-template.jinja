@@ -5,9 +5,8 @@ resources:
 - name: {{env["name"]}}-allow-web
   type: compute.v1.firewall
   properties:
-    network: {{env["network"]}} 
+    network: {{properties["network"]}} 
     sourceRanges: ["0.0.0.0/0"]
     allowed:
-    - IPProtocol: {{env["protocol"]}}
-      ports ["80, 443"]
-      
+    - IPProtocol: {{properties["protocol"]}}
+      ports: ["80", "443"]

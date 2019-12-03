@@ -10,3 +10,23 @@ imports:
 # Import the Firewall Jinja Template
 - path: firewall-template.jinja
 
+resources: 
+- name: production
+  type: production-network-template.jinja
+- name: lamp-net-euw
+  type: lamp-subnetwork-template.jinja
+  properties:
+    ipRange: 10.10.0.0/16
+    network: $(ref.production.selfLink)
+    region: europe-west4
+- name: lamp-net-useast
+  type: lamp-subnetwork-template.jinja
+  properties:
+    ipRange: 10.20.0.0/16
+    network: $(ref.production.selfLink)
+    region: us-east4
+- name: lamp
+  type: firewall-template.jinja
+  properties:
+    network: $(ref.production.selfLink)
+    protocol: TCP
