@@ -10,21 +10,29 @@ imports:
 # Import the Firewall Jinja Template
 - path: firewall-template.jinja
 
-resources: 
+resources:
+# The below items create a VPC Network (Production, with 2 Subnets in 2 regions)
+# for this assignment
+# ************************
+# Create Network called production
 - name: production
   type: production-network-template.jinja
+# Create a subnet in the eu-west4 zone
 - name: lamp-net-euw
   type: lamp-subnetwork-template.jinja
   properties:
     ipRange: 10.10.0.0/16
     network: $(ref.production.selfLink)
     region: europe-west4
+# Create a subnet in the us-east4 zone
 - name: lamp-net-useast
   type: lamp-subnetwork-template.jinja
   properties:
     ipRange: 10.20.0.0/16
     network: $(ref.production.selfLink)
     region: us-east4
+# Create a Firewall for the VPC Network, and place Prodcution
+# behind it.
 - name: lamp
   type: firewall-template.jinja
   properties:
