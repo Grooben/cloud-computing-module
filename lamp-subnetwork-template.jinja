@@ -1,0 +1,11 @@
+# Author: Oliver Martin Grooby (16605155)
+# This Jinja file configures a subnetwork from a named network
+# for the use of this project.
+
+resources:
+- name: {{env["name"]}}
+  type: compute.v1.subnetwork
+  properties: 
+    ipCidrRange: {{env["ipRange"]}}
+    network: {{env["network"]}}
+    region: {{env["region"]}}
