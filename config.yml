@@ -11,6 +11,9 @@ imports:
 - path: firewall-template.jinja
 # Import the "Small LAMP VM" Template
 - path: small-lamp-vm-template.jinja
+# Import the "LAMP VM" Template - which just has an extra core
+# and 5GB more disk space because I can
+- path: lamp-vm-template.jinja
 
 resources:
 # The below items create a VPC Network (Production, with 2 Subnets in 2 regions)
@@ -40,12 +43,24 @@ resources:
   properties:
     network: $(ref.production.selfLink)
     protocol: TCP
+# Create a "small" (n1-standard-1) VM to run a LAMP
+# stack on.
 - name: lamp-small
   type: small-lamp-vm-template.jinja
   properties:
     zone: europe-west4-b
     network: $(ref.production.selfLink)
-    subnet: $(ref.lamp-net-euw)
+    subnet: $(ref.lamp-net-euw.selfLink)
     tags:
       - http
-
+# Create a "normal" (n1-standard-2) VM to run a LAMP
+# stack on. This time on a different subnet and using the 
+# alternate template
+- name: lamp-normal
+  type: lamp-vm-template.jinja
+  properties:
+    zone: us-east4-b
+    network: $(ref.production.selfLink)
+    subnet: $(ref.lamp-net-useast.selfLink)
+    tags:
+      - http
