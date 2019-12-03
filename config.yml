@@ -9,6 +9,8 @@ imports:
 - path: lamp-subnetwork-template.jinja
 # Import the Firewall Jinja Template
 - path: firewall-template.jinja
+# Import the "Small LAMP VM" Template
+- path: small-lamp-vm-template.jinja
 
 resources:
 # The below items create a VPC Network (Production, with 2 Subnets in 2 regions)
@@ -38,3 +40,12 @@ resources:
   properties:
     network: $(ref.production.selfLink)
     protocol: TCP
+- name: lamp-small
+  type: small-lamp-vm-template.jinja
+  properties:
+    zone: europe-west4-b
+    network: $(ref.production.selfLink)
+    subnet: $(ref.lamp-net-euw)
+    tags:
+      - http
+
