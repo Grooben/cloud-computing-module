@@ -1,0 +1,13 @@
+# This Jinja Template defines a network firewall that can
+# be applied to a given network.
+
+resources:
+- name: {{env["name"]}}-allow-web
+  type: compute.v1.firewall
+  properties:
+    network: {{env["network"]}} 
+    sourceRanges: ["0.0.0.0/0"]
+    allowed:
+    - IPProtocol: {{env["protocol"]}}
+      ports ["80, 443"]
+      

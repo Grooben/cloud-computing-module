@@ -2,6 +2,11 @@
 
 # Below is a YAML script that will generate the infastracture required
 # for the assignment
-
+imports:
 # Import the Production Newtwork Jinja Template
-- import: production-network-config.yaml
+- path: production-network-template.jinja
+# Import the LAMP Subnetwork Jinja Template 
+- path: lamp-subnetwork-template.jinja
+# Import the Firewall Jinja Template
+- path: firewall-template.jinja
+
