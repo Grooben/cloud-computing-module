@@ -8,10 +8,10 @@ resources:
         items:
             - key: deployment
               value: {{env["name"]}}
-            {% if imports['startup'] %}
+            {% if imports['startup-script'] %}
             - key: startup-script
               value: |
-                {{ imports['startup'] | indent(12) }}
+                {{ imports['startup-script'] | indent(16) }}
             {% endif %}
             {% for i in properties["metadata"] %}
             - {{i}}

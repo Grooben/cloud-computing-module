@@ -14,6 +14,8 @@ imports:
 # Import the "LAMP VM" Template - which just has an extra core
 # and 5GB more disk space because I can
 - path: lamp-vm-template.jinja
+- path: startup.sh
+  name: startup-script
 
 resources:
 # The below items create a VPC Network (Production, with 2 Subnets in 2 regions)
