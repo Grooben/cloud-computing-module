@@ -2,3 +2,6 @@
 
 # Below is a YAML script that will generate the infastracture required
 # for the assignment
+
+# Import the Production Newtwork Jinja Template
+- import: production-network-config.yaml

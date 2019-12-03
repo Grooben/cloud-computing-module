@@ -1,0 +1,9 @@
+# Author: Oliver Martin Grooby (16605155)
+# This YAML file configures a network named "PRODUCTION"
+# for the use of this project.
+
+resources:
+- name: {{env["name"]}}
+  type: compute.v1.network
+  properties:
+    autoCreateSubnetworks: false
