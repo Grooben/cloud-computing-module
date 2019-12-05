@@ -14,6 +14,10 @@ imports:
 # Import the "LAMP VM" Template - which just has an extra core
 # and 5GB more disk space because I can
 - path: lamp-vm-template.jinja
+# Import the the CloudSQL instance template
+- path: cloudsql-template.jinja
+# Import a startup script used to configure the GCE
+# Virtual Machines.
 - path: startup.sh
   name: startup-script
 
@@ -45,6 +49,23 @@ resources:
   properties:
     network: $(ref.production.selfLink)
     protocol: TCP
+# Create a CloudSQL instance to host a database, this instance 
+# will also have a failover instance as well as 1 Read Replica.
+- name: cloudsql
+  type: cloudsql-template.jinja
+  properties:
+    cloudsql:
+      region: europe-west4
+      zone: europe-west4-b
+      tier: db-n1-standard-2
+      backupStartTime: "00:00"
+    database:
+      name: test
+    dbUser:
+      user: root
+      password: test123_
+    failover: true
+    readReplicas: 1
 # Create a "small" (n1-standard-1) VM to run a LAMP
 # stack on.
 - name: lamp-small
@@ -66,15 +87,4 @@ resources:
     subnet: $(ref.lamp-net-useast.selfLink)
     tags:
       - http
-- name: euw-instances
-  type: instance-group-template.jinja
-  properties:
-    zone: europe-west4-b
-    network: $(ref.production.selfLink)
-- name: euw-instances-members
-  action: gcp-types/compute-v1:compute.instanceGroups.addInstances
-  properties:
-    project: 
-    zone: europe-west4-b
-    instanceGroup: euw-instances
-    instances: [instance: $ref.lamp-small.selfLink]
+

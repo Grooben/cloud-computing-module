@@ -1,0 +1,100 @@
+{#
+Copyright 2018 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+#}
+
+{% set ID = env['name'] %}
+
+{%- macro dbDependencyList(failover='', readReplicas='') -%}
+  {% if failover %}
+    - {{ ID }}-failover
+  {% endif %}
+  {% for i in range(readReplicas) %}
+    - {{ ID }}-readreplica-{{ i }}
+  {% endfor %}
+{%- endmacro %}
+
+{% set dbDeps = dbDependencyList(properties['failover'], 
+  properties['readReplicas']) %}
+
+resources:
+- name: {{ ID }}-master
+  type: sqladmin.v1beta4.instance
+  properties:
+    region: {{ properties['cloudsql']['region'] }}
+    settings:
+      tier: {{ properties['cloudsql']['tier'] }}
+      storageAutoResize: true
+      replicationType: SYNCHRONOUS
+      locationPreference:
+        zone: {{ properties['cloudsql']['zone'] }}
+      activationPolicy: ALWAYS
+      backupConfiguration:
+        enabled: true
+        binaryLogEnabled: true
+        startTime: {{ properties['cloudsql']['backupStartTime'] }}
+        
+{% if properties['failover'] %}
+- name: {{ ID }}-failover
+  type: sqladmin.v1beta4.instance
+  properties:
+    region: {{ properties['cloudsql']['region'] }}
+    masterInstanceName: $(ref.{{ ID }}-master.name)
+    replicaConfiguration:
+      failoverTarget: true
+    settings:
+      tier: {{ properties['cloudsql']['tier'] }}
+{% endif %}
+
+{% for i in range(properties['readReplicas']) %}
+- name: {{ ID }}-readreplica-{{ i }}
+  type: sqladmin.v1beta4.instance
+  properties:
+    region: {{ properties['cloudsql']['region'] }}
+    masterInstanceName: $(ref.{{ ID }}-master.name)
+    replicaConfiguration:
+      failoverTarget: false
+    settings:
+      tier: {{ properties['cloudsql']['tier'] }}
+  {% if properties['failover'] %}
+  metadata:
+    dependsOn:
+      - {{ ID }}-failover
+  {% endif %}
+{% endfor %}
+
+{% if properties['database'] %}
+- name: {{ ID }}-db
+  type: sqladmin.v1beta4.database
+  properties:
+    name: {{ properties['database']['name'] }}
+    instance: $(ref.{{ ID }}-master.name)
+  metadata:
+    dependsOn: 
+      {{ dbDeps }}
+{% endif %}
+
+{% if properties['dbUser'] %}
+- name: {{ ID }}-db-root
+  type: sqladmin.v1beta4.user
+  properties:
+    name: {{ properties['dbUser']['name'] }}
+    host:  "{{ properties['dbUser']['host'] }}"
+    instance: $(ref.{{ ID }}-master.name)
+    password: {{ properties['dbUser']['password'] }}
+  metadata:
+    dependsOn:
+    {% if properties['database'] %}
+      - {{ ID }}-db
+    {% else %}
+      {{ dbDeps }}  
+    {% endif %}
+{% endif %}
