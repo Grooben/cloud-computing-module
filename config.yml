@@ -66,3 +66,15 @@ resources:
     subnet: $(ref.lamp-net-useast.selfLink)
     tags:
       - http
+- name: euw-instances
+  type: instance-group-template.jinja
+  properties:
+    zone: europe-west4-b
+    network: $(ref.production.selfLink)
+- name: euw-instances-members
+  action: gcp-types/compute-v1:compute.instanceGroups.addInstances
+  properties:
+    project: 
+    zone: europe-west4-b
+    instanceGroup: euw-instances
+    instances: [instance: $ref.lamp-small.selfLink]
